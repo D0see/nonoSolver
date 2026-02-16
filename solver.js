@@ -1,21 +1,3 @@
-const rows = [
-    [],
-    [4],
-    [3, 1],
-    [2, 1],
-    [2]
-];
-
-const columns = [
-    [2],
-    [3],
-    [2, 1],
-    [1, 1],
-    [3]
-];
-
-const grid = new Array(rows.length).fill((new Array(columns.length).fill(null)));
-    
 function getArrangements(
     blockSizes, 
     lineLength, 
@@ -61,10 +43,6 @@ function getArrangements(
     return arrangements;
 }
 
-console.log(getArrangements([2, 1], 5)); 
-// should be [ [ 2, null, 1, null ], [ 2, null, null, 1 ], [ null, 2, null, 1 ] ]
-
-
 function arrangementFitsRow(grid, arrangement, y) {
 
     currIndex = 0;
@@ -91,12 +69,6 @@ function arrangementFitsRow(grid, arrangement, y) {
     return true;
 }
 
-console.log(arrangementFitsRow([[true, true, null, true, null]], [ 2, null, 1, null ], 0)); 
-// should be true
-
-console.log(arrangementFitsRow([[true, true, null, null, null]], [ 2, null, 1, null ], 0)); 
-// should be false
-
 function insertArrangementIntoCol(grid, x, arrangement) {
 
     currIndex = 0;
@@ -120,21 +92,8 @@ function insertArrangementIntoCol(grid, x, arrangement) {
     return grid;
 }
 
-console.log(insertArrangementIntoCol([
-    [null, null, null, null],
-    [null, null, null, null],
-    [null, null, null, null],
-    [null, null, null, null],
-], 1, [1, null, 2])); 
-
-// should return [
-//   [ null, true, null, null ],
-//   [ null, null, null, null ],
-//   [ null, true, null, null ],
-//   [ null, true, null, null ]
-// ]
-
 function solve(
+    //todo columns and rows should be arrangements
     rows, 
     columns, 
     rowIndex = 0, 
@@ -152,6 +111,7 @@ function solve(
         for (let i = 0; i < arrangements.length; i++) {
             const currArrangement = arrangements[i];
 
+            //todo instead of copying the grid, just pass a ref of the columns
             const nextGrid = insertArrangementIntoCol(JSON.parse(JSON.stringify(currGrid)), x, currArrangement);
 
             solve(
@@ -176,21 +136,22 @@ function solve(
         // if arrangement fits progress solve
         for (let i = 0; i < arrangements.length; i++) {
             
-            if (arrangementFitsRow(currGrid, arrangements[i], y)) break;
+            if (arrangementFitsRow(currGrid, arrangements[i], y)) {
+                solve(
+                    rows,
+                    columns, 
+                    rowIndex + 1, 
+                    colIndex, 
+                    currGrid,
+                    finalGrid
+                );
+
+                if (finalGrid[0]) return finalGrid[0];
+            }
 
             if (i === arrangements.length - 1) return;
         }
 
-        solve(
-            rows,
-            columns, 
-            rowIndex + 1, 
-            colIndex, 
-            currGrid,
-            finalGrid
-        );
-
-        if (finalGrid[0]) return finalGrid[0];
     }
 
     finalGrid[0] = currGrid;
@@ -198,11 +159,54 @@ function solve(
     return finalGrid[0];
 }
 
+// console.log(solve(
+//     [
+//         [10],
+//         [2,1,2,1],
+//         [5, 1],
+//         [1,2,2],
+//         [2,6],
+//         [7],
+//         [3,2],
+//         [4,5],
+//         [7],
+//         [8]
+//     ],
+//     [
+//         [1,3,1],
+//         [3,4],
+//         [4,5],
+//         [1,8],
+//         [3,2,2],
+//         [1,1,2,3],
+//         [2,2,3],
+//         [2,2,4],
+//         [1,2,4],
+//         [3,1,1]
+//     ]
+    
+// ));
+
+const rows = [
+    [1],
+    [4],
+    [3, 1],
+    [2, 1],
+    [2]
+];
+
+const columns = [
+    [1, 2],
+    [3],
+    [2, 1],
+    [1, 1],
+    [3]
+];
+
 console.log(solve(
     rows,
     columns
 ));
-//should return [ [ true, null ], [ null, true ] ]
 
 // for each rows and columns try every permutations until one works
 // then proceeds to the next permutation, a permuation is considered
