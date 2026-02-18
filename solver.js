@@ -93,21 +93,18 @@ function insertArrangementIntoCol(grid, x, arrangement) {
 }
 
 function solve(
-    //todo columns and rows should be arrangements
-    rows, 
-    columns, 
+    rowsArrangements, 
+    columnsArrangements, 
     rowIndex = 0, 
     colIndex = 0, 
-    currGrid = new Array(rows.length).fill((new Array(columns.length).fill(false))), 
+    currGrid = new Array(rowsArrangements.length).fill((new Array(columns.length).fill(false))), 
     finalGrid = [false]
 ) {
     if (finalGrid[0]) return finalGrid[0];
 
     // first we place the columns
     for (let x = colIndex; x < columns.length; x++) {
-        const currBlockSizes = columns[x];
-        const arrangements = getArrangements(currBlockSizes, columns.length);
-
+        const arrangements = columnsArrangements[x];
         //todo maybe we could rework this part and invalidate rows just when they are placed testing them to see if at least one column
         // arrangements fits
         // maybe we could filter the column arrangement which fits and only test further columns against those
@@ -118,8 +115,8 @@ function solve(
             const nextGrid = insertArrangementIntoCol(JSON.parse(JSON.stringify(currGrid)), x, currArrangement);
 
             solve(
-                rows,
-                columns, 
+                rowsArrangements,
+                columnsArrangements, 
                 rowIndex, 
                 colIndex + 1, 
                 nextGrid,
@@ -132,17 +129,16 @@ function solve(
     }
 
     //then we try to find a row arrangement which works
-    for (let y = rowIndex; y < rows.length; y++) {
-        const currBlockSizes = rows[y];
-        const arrangements = getArrangements(currBlockSizes, rows.length);
+    for (let y = rowIndex; y < rowsArrangements.length; y++) {
+        const arrangements = rowsArrangements[y];
 
         // if arrangement fits progress solve
         for (let i = 0; i < arrangements.length; i++) {
             
             if (arrangementFitsRow(currGrid, arrangements[i], y)) {
                 solve(
-                    rows,
-                    columns, 
+                    rowsArrangements,
+                    columnsArrangements,  
                     rowIndex + 1, 
                     colIndex, 
                     currGrid,
@@ -161,6 +157,35 @@ function solve(
 
     return finalGrid[0];
 }
+
+const rows = [
+    [1],
+    [4],
+    [3, 1],
+    [2, 1],
+    [2]
+];
+
+const columns = [
+    [1, 2],
+    [3],
+    [2, 1],
+    [1, 1],
+    [3]
+];
+
+const rowsArrangements = rows.map(row => getArrangements(row, columns.length));
+
+const columnsArrangements = columns.map(column => getArrangements(column, rows.length));
+
+console.log(solve(
+    rowsArrangements,
+    columnsArrangements
+));
+
+// for each rows and columns try every permutations until one works
+// then proceeds to the next permutation, a permuation is considered
+// working when all it square overlap with previously existing squares
 
 // console.log(solve(
 //     [
@@ -189,28 +214,3 @@ function solve(
 //     ]
     
 // ));
-
-const rows = [
-    [1],
-    [4],
-    [3, 1],
-    [2, 1],
-    [2]
-];
-
-const columns = [
-    [1, 2],
-    [3],
-    [2, 1],
-    [1, 1],
-    [3]
-];
-
-console.log(solve(
-    rows,
-    columns
-));
-
-// for each rows and columns try every permutations until one works
-// then proceeds to the next permutation, a permuation is considered
-// working when all it square overlap with previously existing squares
