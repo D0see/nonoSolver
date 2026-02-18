@@ -92,18 +92,18 @@ function insertArrangementIntoCol(grid, x, arrangement) {
     return grid;
 }
 
-function solve(
+function solver(
     rowsArrangements, 
     columnsArrangements, 
     rowIndex = 0, 
     colIndex = 0, 
-    currGrid = new Array(rowsArrangements.length).fill((new Array(columns.length).fill(false))), 
+    currGrid = new Array(rowsArrangements.length).fill((new Array(columnsArrangements.length).fill(false))), 
     finalGrid = [false]
 ) {
     if (finalGrid[0]) return finalGrid[0];
 
     // first we place the columns
-    for (let x = colIndex; x < columns.length; x++) {
+    for (let x = colIndex; x < columnsArrangements.length; x++) {
         const arrangements = columnsArrangements[x];
         //todo maybe we could rework this part and invalidate rows just when they are placed testing them to see if at least one column
         // arrangements fits
@@ -114,7 +114,7 @@ function solve(
             //todo instead of copying the grid, just pass a ref of the rows and test the columns instead
             const nextGrid = insertArrangementIntoCol(JSON.parse(JSON.stringify(currGrid)), x, currArrangement);
 
-            solve(
+            solver(
                 rowsArrangements,
                 columnsArrangements, 
                 rowIndex, 
@@ -136,7 +136,7 @@ function solve(
         for (let i = 0; i < arrangements.length; i++) {
             
             if (arrangementFitsRow(currGrid, arrangements[i], y)) {
-                solve(
+                solver(
                     rowsArrangements,
                     columnsArrangements,  
                     rowIndex + 1, 
@@ -158,59 +158,53 @@ function solve(
     return finalGrid[0];
 }
 
-const rows = [
-    [1],
-    [4],
-    [3, 1],
-    [2, 1],
-    [2]
-];
+function solveNonogram (
+    rows,
+    columns
+) {
 
-const columns = [
-    [1, 2],
-    [3],
-    [2, 1],
-    [1, 1],
-    [3]
-];
+    const rowsArrangements = rows.map(row => getArrangements(row, columns.length));
+    const columnsArrangements = columns.map(column => getArrangements(column, rows.length));
 
-const rowsArrangements = rows.map(row => getArrangements(row, columns.length));
+    return solver(rowsArrangements, columnsArrangements);
+}
 
-const columnsArrangements = columns.map(column => getArrangements(column, rows.length));
+console.log(solveNonogram(
+        [
+            [1],
+            [4],
+            [3, 1],
+            [2, 1],
+            [2]
+        ], 
+        [
+            [1, 2],
+            [3],
+            [2, 1],
+            [1, 1],
+            [3],
+        ]
+    )
+);
 
-console.log(solve(
-    rowsArrangements,
-    columnsArrangements
-));
+// console.log(solveNonogram(
+//         [
+//             [1, 1],
+//             [1 ,1],
+//             [1, 1],
+//             [1, 1],
+//             [1, 1]
+//         ], 
+//         [
+//             [1, 1],
+//             [1, 1],
+//             [1, 1],
+//             [1, 1],
+//             [1, 1],
+//         ]
+//     )
+// );
 
 // for each rows and columns try every permutations until one works
 // then proceeds to the next permutation, a permuation is considered
 // working when all it square overlap with previously existing squares
-
-// console.log(solve(
-//     [
-//         [10],
-//         [2,1,2,1],
-//         [5, 1],
-//         [1,2,2],
-//         [2,6],
-//         [7],
-//         [3,2],
-//         [4,5],
-//         [7],
-//         [8]
-//     ],
-//     [
-//         [1,3,1],
-//         [3,4],
-//         [4,5],
-//         [1,8],
-//         [3,2,2],
-//         [1,1,2,3],
-//         [2,2,3],
-//         [2,2,4],
-//         [1,2,4],
-//         [3,1,1]
-//     ]
-    
-// ));
