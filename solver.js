@@ -17,7 +17,7 @@ function getArrangements(
         // if we have at least on block to place
         inputArrIndex < blockSizes.length && 
         // if this is the fist block or the last element was an empty space
-        (inputArrIndex === 0 || currArrangement[currArrangement.length - 1] === null)
+        (inputArrIndex === 0 || currArrangement[currArrangement.length - 1] === false)
     ) {
         getArrangements(
             blockSizes,
@@ -35,7 +35,7 @@ function getArrangements(
             lineLength, 
             gaps - 1, 
             inputArrIndex,
-            [...currArrangement, null],
+            [...currArrangement, false],
             arrangements
         );
     }
@@ -50,11 +50,11 @@ function arrangementFitsRow(grid, arrangement, y) {
     for (const boxSize of arrangement) {
 
         // if current box is a space and the current grid square is also a space
-        if (boxSize === null && grid[y][currIndex] === null) {
+        if (boxSize === false && grid[y][currIndex] === false) {
             currIndex++;
             continue;
-        // if current box is not null and current grid square isnt either
-        } else if (boxSize !== null && grid[y][currIndex] === true) {
+        // if current box is not false and current grid square isnt either
+        } else if (boxSize !== false && grid[y][currIndex] === true) {
             for (i = 0; i < boxSize; i++) {
                 if (grid[y][currIndex + i] !== true) {
                     return false;
@@ -74,12 +74,12 @@ function insertArrangementIntoCol(grid, x, arrangement) {
     currIndex = 0;
 
     for (const boxSize of arrangement) {
-        if (boxSize === null) {
+        if (boxSize === false) {
 
-            grid[currIndex][x] = null;
+            grid[currIndex][x] = false;
             currIndex++;
 
-        } else if (boxSize !== null) {
+        } else if (boxSize !== false) {
 
             for (i = 0; i < boxSize; i++) {
                 grid[currIndex][x] = true;
@@ -98,8 +98,8 @@ function solve(
     columns, 
     rowIndex = 0, 
     colIndex = 0, 
-    currGrid = new Array(rows.length).fill((new Array(columns.length).fill(null))), 
-    finalGrid = [null]
+    currGrid = new Array(rows.length).fill((new Array(columns.length).fill(false))), 
+    finalGrid = [false]
 ) {
     if (finalGrid[0]) return finalGrid[0];
 
@@ -108,10 +108,13 @@ function solve(
         const currBlockSizes = columns[x];
         const arrangements = getArrangements(currBlockSizes, columns.length);
 
+        //todo maybe we could rework this part and invalidate rows just when they are placed testing them to see if at least one column
+        // arrangements fits
+        // maybe we could filter the column arrangement which fits and only test further columns against those
         for (let i = 0; i < arrangements.length; i++) {
             const currArrangement = arrangements[i];
 
-            //todo instead of copying the grid, just pass a ref of the columns
+            //todo instead of copying the grid, just pass a ref of the rows and test the columns instead
             const nextGrid = insertArrangementIntoCol(JSON.parse(JSON.stringify(currGrid)), x, currArrangement);
 
             solve(
@@ -211,6 +214,3 @@ console.log(solve(
 // for each rows and columns try every permutations until one works
 // then proceeds to the next permutation, a permuation is considered
 // working when all it square overlap with previously existing squares
-
-
-
