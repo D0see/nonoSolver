@@ -43,32 +43,6 @@ function getArrangements(
     return arrangements;
 }
 
-function arrangementFitsRow(grid, arrangement, y) {
-
-    currIndex = 0;
-
-    for (const boxSize of arrangement) {
-
-        // if current box is a space and the current grid square is also a space
-        if (boxSize === false && grid[y][currIndex] === false) {
-            currIndex++;
-            continue;
-        // if current box is not false and current grid square isnt either
-        } else if (boxSize !== false && grid[y][currIndex] === true) {
-            for (i = 0; i < boxSize; i++) {
-                if (grid[y][currIndex + i] !== true) {
-                    return false;
-                }
-            }
-            currIndex += boxSize;
-        } else {
-            return false;
-        }
-    }
-
-    return true;
-}
-
 function insertArrangementIntoCol(grid, x, arrangement) {
 
     currIndex = 0;
@@ -92,6 +66,47 @@ function insertArrangementIntoCol(grid, x, arrangement) {
     return grid;
 }
 
+function arrangementFitsRow(grid, arrangement, y, maxXIndex) {
+
+    currX = 0;
+
+    for (const boxSize of arrangement) {
+        if (currX > maxXIndex) return true;
+
+        // if current box is a space and the current grid square is also a space
+        if (boxSize === false && grid[y][currX] === false) {
+            currX++;
+            continue;
+        // if current box is not false and current grid square isnt either
+        } else if (boxSize !== false && grid[y][currX] === true) {
+            let i;
+            for (i = 0; i < boxSize; i++) {
+                if (currX + i > maxXIndex) return true;
+                if (grid[y][currX + i] !== true) {
+                    return false;
+                }
+                
+            }
+
+            currX += i;
+        } else {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function filterPossibleRowsArrangements(rowsArrangements, nextGrid, colIndex){
+    const possibleRowsArrangements = JSON.parse(JSON.stringify(rowsArrangements));
+    
+    for (const [rowIndex, rowArrangements] of rowsArrangements.entries()) {
+        possibleRowsArrangements[rowIndex] = rowArrangements.filter(rowArrangement => arrangementFitsRow(nextGrid, rowArrangement, rowIndex, colIndex));
+    }
+
+    return possibleRowsArrangements;
+}
+
 function solver(
     rowsArrangements, 
     columnsArrangements, 
@@ -100,22 +115,38 @@ function solver(
     currGrid = new Array(rowsArrangements.length).fill((new Array(columnsArrangements.length).fill(false))), 
     finalGrid = [false]
 ) {
+    if (colIndex === columnsArrangements) {
+        finalGrid[0] = currGrid;
+
+        return finalGrid[0];
+    }
+
     if (finalGrid[0]) return finalGrid[0];
 
-    // first we place the columns
     for (let x = colIndex; x < columnsArrangements.length; x++) {
         const arrangements = columnsArrangements[x];
-        //todo maybe we could rework this part and invalidate rows just when they are placed testing them to see if at least one column
-        // arrangements fits
-        // maybe we could filter the column arrangement which fits and only test further columns against those
+
         for (let i = 0; i < arrangements.length; i++) {
+            
             const currArrangement = arrangements[i];
 
             //todo instead of copying the grid, just pass a ref of the rows and test the columns instead
             const nextGrid = insertArrangementIntoCol(JSON.parse(JSON.stringify(currGrid)), x, currArrangement);
 
+            //here we filter the rowsArrangement for ones that fits the currentcolumn arrangement
+            const possibleRowsArrangements = filterPossibleRowsArrangements(rowsArrangements, nextGrid, colIndex);
+
+            //then we check that every rowsArrangements array holds at least arrangement and if so we continue the solve
+            if (possibleRowsArrangements.some(arrangements => arrangements.length === 0)) continue;
+
+            if (colIndex === columnsArrangements.length - 1) {
+                finalGrid[0] = nextGrid;
+
+                return finalGrid[0];
+            }
+
             solver(
-                rowsArrangements,
+                possibleRowsArrangements,
                 columnsArrangements, 
                 rowIndex, 
                 colIndex + 1, 
@@ -127,33 +158,6 @@ function solver(
             
         }
     }
-
-    //then we try to find a row arrangement which works
-    for (let y = rowIndex; y < rowsArrangements.length; y++) {
-        const arrangements = rowsArrangements[y];
-
-        // if arrangement fits progress solve
-        for (let i = 0; i < arrangements.length; i++) {
-            
-            if (arrangementFitsRow(currGrid, arrangements[i], y)) {
-                solver(
-                    rowsArrangements,
-                    columnsArrangements,  
-                    rowIndex + 1, 
-                    colIndex, 
-                    currGrid,
-                    finalGrid
-                );
-
-                if (finalGrid[0]) return finalGrid[0];
-            }
-
-            if (i === arrangements.length - 1) return;
-        }
-
-    }
-
-    finalGrid[0] = currGrid;
 
     return finalGrid[0];
 }
@@ -169,58 +173,40 @@ function solveNonogram (
     return solver(rowsArrangements, columnsArrangements);
 }
 
-// console.log(solveNonogram(
-//         [
-//             [1],
-//             [4],
-//             [3, 1],
-//             [2, 1],
-//             [2]
-//         ], 
-//         [
-//             [1, 2],
-//             [3],
-//             [2, 1],
-//             [1, 1],
-//             [3],
-//         ]
-//     )
-// );
-
-// console.log(solveNonogram(
-//         [
-//             [1, 1],
-//             [1 ,1],
-//             [1, 1],
-//             [1, 1],
-//             [1, 1],
-//             [1, 2],
-//         ], 
-//         [
-//             [1, 1],
-//             [1, 1],
-//             [1, 1],
-//             [1, 1],
-//             [1, 1],
-//             [2, 1]
-//         ]
-//     )
-// );
-
 console.log(solveNonogram(
         [
             [1],
-            [2],
-            [1]
+            [4],
+            [3, 1],
+            [2, 1],
+            [2]
         ], 
         [
-            [1],
-            [1],
-            [1, 1]
+            [1, 2],
+            [3],
+            [2, 1],
+            [1, 1],
+            [3],
         ]
     )
 );
 
-// for each rows and columns try every permutations until one works
-// then proceeds to the next permutation, a permuation is considered
-// working when all it square overlap with previously existing squares
+console.log(solveNonogram(
+        [
+            [1, 1],
+            [1 ,1],
+            [1, 1],
+            [1, 1],
+            [1, 1],
+            [1, 2],
+        ], 
+        [
+            [1, 1],
+            [1, 1],
+            [1, 1],
+            [1, 1],
+            [1, 1],
+            [2, 1]
+        ]
+    )
+);
