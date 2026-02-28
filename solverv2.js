@@ -130,6 +130,7 @@ function solver(
             const nextGrid = insertArrangementIntoCol(JSON.parse(JSON.stringify(currGrid)), x, currArrangement);
 
             //here we filter the rowsArrangement for ones that fits the currentcolumn arrangement
+            //todo only check the fitness of the current column, skip the one before (necessitate reworking arrangements)
             const possibleRowsArrangements = filterPossibleRowsArrangements(rowsArrangements, nextGrid, colIndex);
 
             //then we check that every rowsArrangements array holds at least arrangement and if so we continue the solve
