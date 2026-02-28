@@ -66,6 +66,7 @@ function insertArrangementIntoCol(grid, x, arrangement) {
     return grid;
 }
 
+//todo fix this very bad shit function
 function arrangementFitsRow(grid, arrangement, y, maxXIndex) {
 
     currX = 0;
@@ -125,7 +126,7 @@ function solver(
             
             const currArrangement = arrangements[i];
 
-            //todo instead of copying the grid, just pass a ref of the rows and test the columns instead
+            //todo instead of copying the grid, just pass a ref of the rows and test the columns instead (massive perf gain)
             const nextGrid = insertArrangementIntoCol(JSON.parse(JSON.stringify(currGrid)), x, currArrangement);
 
             //here we filter the rowsArrangement for ones that fits the currentcolumn arrangement
@@ -200,6 +201,32 @@ console.log(solveNonogram(
             [1, 1],
             [1, 1],
             [2, 1]
+        ]
+    )
+);
+
+console.log(solveNonogram(
+        [
+            [1, 1],
+            [1 ,1],
+            [1, 1],
+            [1, 1],
+            [1, 1],
+            [1, 2],
+            [1, 1],
+            [1, 1],
+            [1, 1],
+        ], 
+        [
+            [1, 1],
+            [1, 1],
+            [1, 1],
+            [1, 1],
+            [1, 1],
+            [2, 1],
+            [1, 1],
+            [1, 1],
+            [1, 1]
         ]
     )
 );
