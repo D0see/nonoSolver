@@ -115,11 +115,6 @@ function solver(
     currGrid = new Array(rowsArrangements.length).fill((new Array(columnsArrangements.length).fill(false))), 
     finalGrid = [false]
 ) {
-    if (colIndex === columnsArrangements) {
-        finalGrid[0] = currGrid;
-
-        return finalGrid[0];
-    }
 
     if (finalGrid[0]) return finalGrid[0];
 
@@ -153,8 +148,6 @@ function solver(
                 nextGrid,
                 finalGrid
             );
-
-            if (finalGrid[0]) return finalGrid[0];
             
         }
     }
