@@ -14,9 +14,9 @@ function getArrangements(
     }
 
     if (
-        // if we have at least on block to place
+        // if we have at least one block to place
         inputArrIndex < blockSizes.length && 
-        // if this is the fist block or the last element was an empty space
+        // if this is the first block or the last element was an empty space
         (inputArrIndex === 0 || currArrangement[currArrangement.length - 1] === false)
     ) {
         getArrangements(
@@ -24,7 +24,7 @@ function getArrangements(
             lineLength, 
             gaps, 
             inputArrIndex + 1,
-            [...currArrangement, blockSizes[inputArrIndex]],
+            [...currArrangement, ...(new Array(blockSizes[inputArrIndex])).fill(true)],
             arrangements
         );
     }
@@ -45,65 +45,26 @@ function getArrangements(
 
 function insertArrangementIntoCol(grid, x, arrangement) {
 
-    let currIndex = 0;
-
-    for (const boxSize of arrangement) {
-        if (boxSize === false) {
-
-            grid[currIndex][x] = false;
-            currIndex++;
-
-        } else if (boxSize !== false) {
-            let i;
-            for (i = 0; i < boxSize; i++) {
-                grid[currIndex][x] = true;
-                currIndex++;
-            }
-
-        }
+    for (const [index, state] of arrangement.entries()) {
+        grid[index][x] = state;
     } 
 
     return grid;
 }
 
-//todo fix this very bad shit function
-function arrangementFitsRow(grid, arrangement, y, maxXIndex) {
+function arrangementFitsCol(grid, arrangement, y, colIndex) {
 
-    let currX = 0;
-
-    for (const boxSize of arrangement) {
-        if (currX > maxXIndex) return true;
-
-        // if current box is a space and the current grid square is also a space
-        if (boxSize === false && grid[y][currX] === false) {
-            currX++;
-            continue;
-        // if current box is not false and current grid square isnt either
-        } else if (boxSize !== false && grid[y][currX] === true) {
-            let i;
-            for (i = 0; i < boxSize; i++) {
-                if (currX + i > maxXIndex) return true;
-                if (grid[y][currX + i] !== true) {
-                    return false;
-                }
-                
-            }
-
-            currX += i;
-        } else {
-            return false;
-        }
-    }
-
-    return true;
+    return arrangement[colIndex] === grid[y][colIndex];
 }
 
 function filterPossibleRowsArrangements(rowsArrangements, nextGrid, colIndex){
-    const possibleRowsArrangements = JSON.parse(JSON.stringify(rowsArrangements));
+    const possibleRowsArrangements = [];
     
-    for (const [rowIndex, rowArrangements] of rowsArrangements.entries()) {
-        possibleRowsArrangements[rowIndex] = rowArrangements.filter(
-            rowArrangement => arrangementFitsRow(nextGrid, rowArrangement, rowIndex, colIndex)
+    for (const [rowIndex, currRowArrangements] of rowsArrangements.entries()) {
+        possibleRowsArrangements.push(
+            currRowArrangements.filter(
+                currRowArrangement => arrangementFitsCol(nextGrid, currRowArrangement, rowIndex, colIndex)
+            )
         );
     }
 
@@ -130,7 +91,6 @@ function recursiveSolver(
             const nextGrid = insertArrangementIntoCol(JSON.parse(JSON.stringify(currGrid)), x, colArrangement);
 
             //here we filter the rowsArrangement for ones that fits the currentcolumn arrangement
-            //todo only check the fitness of the current column, skip the one before (necessitate reworking arrangements)
             const possibleRowsArrangements = filterPossibleRowsArrangements(rowsArrangements, nextGrid, colIndex);
 
             //then we check that every rowsArrangements array holds at least arrangement and if so we continue the solve

@@ -45,7 +45,7 @@ function getArrangements(
 
 function arrangementFitsRow(grid, arrangement, y) {
 
-    currIndex = 0;
+    let currIndex = 0;
 
     for (const boxSize of arrangement) {
 
@@ -55,6 +55,7 @@ function arrangementFitsRow(grid, arrangement, y) {
             continue;
         // if current box is not false and current grid square isnt either
         } else if (boxSize !== false && grid[y][currIndex] === true) {
+            let i;
             for (i = 0; i < boxSize; i++) {
                 if (grid[y][currIndex + i] !== true) {
                     return false;
@@ -71,7 +72,7 @@ function arrangementFitsRow(grid, arrangement, y) {
 
 function insertArrangementIntoCol(grid, x, arrangement) {
 
-    currIndex = 0;
+    let currIndex = 0;
 
     for (const boxSize of arrangement) {
         if (boxSize === false) {
@@ -80,7 +81,7 @@ function insertArrangementIntoCol(grid, x, arrangement) {
             currIndex++;
 
         } else if (boxSize !== false) {
-
+            let i;
             for (i = 0; i < boxSize; i++) {
                 grid[currIndex][x] = true;
                 currIndex++;
@@ -92,7 +93,7 @@ function insertArrangementIntoCol(grid, x, arrangement) {
     return grid;
 }
 
-function solver(
+function recursiveSolver(
     rowsArrangements, 
     columnsArrangements, 
     rowIndex = 0, 
@@ -114,7 +115,7 @@ function solver(
             //todo instead of copying the grid, just pass a ref of the rows and test the columns instead
             const nextGrid = insertArrangementIntoCol(JSON.parse(JSON.stringify(currGrid)), x, currArrangement);
 
-            solver(
+            recursiveSolver(
                 rowsArrangements,
                 columnsArrangements, 
                 rowIndex, 
@@ -136,7 +137,7 @@ function solver(
         for (let i = 0; i < arrangements.length; i++) {
             
             if (arrangementFitsRow(currGrid, arrangements[i], y)) {
-                solver(
+                recursiveSolver(
                     rowsArrangements,
                     columnsArrangements,  
                     rowIndex + 1, 
@@ -158,7 +159,7 @@ function solver(
     return finalGrid[0];
 }
 
-function solveNonogram (
+export function solveNonogram (
     rows,
     columns
 ) {
@@ -166,61 +167,5 @@ function solveNonogram (
     const rowsArrangements = rows.map(row => getArrangements(row, columns.length));
     const columnsArrangements = columns.map(column => getArrangements(column, rows.length));
 
-    return solver(rowsArrangements, columnsArrangements);
+    return recursiveSolver(rowsArrangements, columnsArrangements);
 }
-
-// console.log(solveNonogram(
-//         [
-//             [1],
-//             [4],
-//             [3, 1],
-//             [2, 1],
-//             [2]
-//         ], 
-//         [
-//             [1, 2],
-//             [3],
-//             [2, 1],
-//             [1, 1],
-//             [3],
-//         ]
-//     )
-// );
-
-// console.log(solveNonogram(
-//         [
-//             [1, 1],
-//             [1 ,1],
-//             [1, 1],
-//             [1, 1],
-//             [1, 1],
-//             [1, 2],
-//         ], 
-//         [
-//             [1, 1],
-//             [1, 1],
-//             [1, 1],
-//             [1, 1],
-//             [1, 1],
-//             [2, 1]
-//         ]
-//     )
-// );
-
-console.log(solveNonogram(
-        [
-            [1],
-            [2],
-            [1]
-        ], 
-        [
-            [1],
-            [1],
-            [1, 1]
-        ]
-    )
-);
-
-// for each rows and columns try every permutations until one works
-// then proceeds to the next permutation, a permuation is considered
-// working when all it square overlap with previously existing squares
