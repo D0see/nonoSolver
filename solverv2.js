@@ -122,12 +122,10 @@ function solver(
     for (let x = colIndex; x < columnsArrangements.length; x++) {
         const arrangements = columnsArrangements[x];
 
-        for (let i = 0; i < arrangements.length; i++) {
-            
-            const currArrangement = arrangements[i];
+        for (const colArrangement of arrangements) {
 
             //todo instead of copying the grid, just pass a ref of the rows and test the columns instead (massive perf gain)
-            const nextGrid = insertArrangementIntoCol(JSON.parse(JSON.stringify(currGrid)), x, currArrangement);
+            const nextGrid = insertArrangementIntoCol(JSON.parse(JSON.stringify(currGrid)), x, colArrangement);
 
             //here we filter the rowsArrangement for ones that fits the currentcolumn arrangement
             //todo only check the fitness of the current column, skip the one before (necessitate reworking arrangements)
@@ -136,6 +134,7 @@ function solver(
             //then we check that every rowsArrangements array holds at least arrangement and if so we continue the solve
             if (possibleRowsArrangements.some(arrangements => arrangements.length === 0)) continue;
 
+            //if this was the last column, return the grid
             if (colIndex === columnsArrangements.length - 1) {
                 finalGrid[0] = nextGrid;
 
@@ -150,7 +149,8 @@ function solver(
                 nextGrid,
                 finalGrid
             );
-            
+
+            if (finalGrid[0]) return finalGrid[0];
         }
     }
 
@@ -217,6 +217,7 @@ console.log(solveNonogram(
             [1, 1],
             [1, 1],
             [1, 1],
+            [1, 1]
         ], 
         [
             [1, 1],
@@ -225,6 +226,7 @@ console.log(solveNonogram(
             [1, 1],
             [1, 1],
             [2, 1],
+            [1, 1],
             [1, 1],
             [1, 1],
             [1, 1]
