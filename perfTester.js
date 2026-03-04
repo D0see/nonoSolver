@@ -1,142 +1,16 @@
 import { solveNonogram } from './solver.js';
+import { buildTestGrid } from './generator.js';
 
-console.time('easy');
+for (let i = 2; i < 20; i++) {
+    const [rows, columns] = buildTestGrid(i);
 
-console.log(solveNonogram(
-        [
-            [1],
-            [4],
-            [3, 1],
-            [2, 1],
-            [2]
-        ], 
-        [
-            [1, 2],
-            [3],
-            [2, 1],
-            [1, 1],
-            [3],
-        ]
-    )
-);
-console.timeEnd('easy');
+    console.time('size ' + i);
 
-console.time('medium');
+    console.log(rows, columns)
 
-console.log(solveNonogram(
-        [
-            [1, 1],
-            [1 ,1],
-            [1, 1],
-            [1, 1],
-            [1, 1],
-            [1, 2],
-        ], 
-        [
-            [1, 1],
-            [1, 1],
-            [1, 1],
-            [1, 1],
-            [1, 1],
-            [2, 1]
-        ]
-    )
-);
-console.timeEnd('medium');
-
-console.time('hard')
-
-console.log(solveNonogram(
-        [
-            [1, 1],
-            [1 ,1],
-            [1, 1],
-            [1, 1],
-            [1, 1],
-            [1, 2],
-            [1, 1],
-            [1, 1],
-            [1, 1],
-            [1, 1]
-        ], 
-        [
-            [1, 1],
-            [1, 1],
-            [1, 1],
-            [1, 1],
-            [1, 1],
-            [2, 1],
-            [1, 1],
-            [1, 1],
-            [1, 1],
-            [1, 1]
-        ]
-    )
-);
-
-console.timeEnd('hard')
-
-console.time('very hard')
-
-console.log(solveNonogram(
-        [
-            [1, 2, 2],
-            [1 ,1],
-            [4, 1],
-            [5, 2],
-            [3, 2],
-            [1, 3],
-            [1, 8],
-            [1],
-            [8],
-            [2, 1]
-        ], 
-        [
-            [5, 1, 1],
-            [4, 1],
-            [1, 3, 1, 1],
-            [1, 2, 1, 1],
-            [1, 1, 1],
-            [3],
-            [1, 2, 2],
-            [1, 2, 2],
-            [1, 1, 3],
-            [2, 1, 1, 1]
-        ]
-    )
-);
-
-console.timeEnd('very hard')
-
-console.time('very hard')
-
-solveNonogram(
-        [
-            [1, 2, 2],
-            [1 ,1],
-            [4, 1],
-            [5, 2],
-            [3, 2],
-            [1, 3],
-            [1, 8],
-            [1],
-            [8],
-            [2, 1]
-        ], 
-        [
-            [5, 1, 1],
-            [4, 1],
-            [1, 3, 1, 1],
-            [1, 2, 1, 1],
-            [1, 1, 1],
-            [3],
-            [1, 2, 2],
-            [1, 2, 2],
-            [1, 1, 3],
-            [2, 1, 1, 1]
-        ]
+    console.log(
+        solveNonogram(rows, columns)
     );
 
-
-console.timeEnd('very hard')
-console.log('printless');
+    console.timeEnd('size ' + i);
+}
