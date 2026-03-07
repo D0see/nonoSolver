@@ -1,9 +1,9 @@
-function generateGrid (size) {
+export function generateGrid (height, width = height, defaultValue = false) {
 
     const grid = [];
 
-    for (let i = 0; i < size; i++) {
-        grid.push((new Array(size)).fill(false))
+    for (let i = 0; i < height; i++) {
+        grid.push((new Array(width)).fill(defaultValue))
     }
 
     return grid;
