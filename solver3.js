@@ -198,8 +198,8 @@ export function solveNonogram (
     columns
 ) {
 
-    const rowsArrangements = rows.map(row => getArrangements(row, columns.length));
-    const columnsArrangements = columns.map(column => getArrangements(column, rows.length));
+    let rowsArrangements = rows.map(row => getArrangements(row, columns.length));
+    let columnsArrangements = columns.map(column => getArrangements(column, rows.length));
 
     let numOfRowsArrangements = rowsArrangements.reduce((acc, val) => acc += val.length, 0);
     let numOfColumnsArrangements = columnsArrangements.reduce((acc, val) => acc += val.length, 0);
@@ -220,6 +220,15 @@ export function solveNonogram (
 
         numOfPrunedRowsArrangements = prunedRowsArrangement.reduce((acc, val) => acc += val.length, 0);
         numOfPrunedColumnsArrangements = prunedColumnsArrangements.reduce((acc, val) => acc += val.length, 0);
+        console.log('_________');
+        console.log('rows', numOfRowsArrangements)
+        console.log('columns', numOfColumnsArrangements);
+        console.log('rows after pruning', numOfPrunedRowsArrangements);
+        console.log('columns after pruning', numOfPrunedColumnsArrangements);
+        console.log('_________');
+
+        rowsArrangements = prunedRowsArrangement;
+        columnsArrangements = prunedColumnsArrangements;
     }
 
     return recursiveSolver(rowsArrangements, columnsArrangements);

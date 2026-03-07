@@ -12,16 +12,16 @@ for (let i = 2; i < 20; i++) {
 
     console.timeEnd('3- ' + i);
     
-    console.time('2- ' + i);
+    // console.time('2- ' + i);
     
-    solver2(rows, columns)
+    // solver2(rows, columns)
 
-    console.timeEnd('2- ' + i);
+    // console.timeEnd('2- ' + i);
 
-    console.time('1- ' + i);
+    // console.time('1- ' + i);
     
-    solver1(rows, columns)
+    // solver1(rows, columns)
 
-    console.timeEnd('1- ' + i);
+    // console.timeEnd('1- ' + i);
 
 }
