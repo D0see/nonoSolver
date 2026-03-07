@@ -1,0 +1,14 @@
+body {
+    height: 95vh;
+    width: 95vw;
+}
+
+#grid {
+    width: 600px;
+    height: 600px;
+    margin: 0 auto;
+    border: 1px solid red;
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    grid-template-rows: repeat(10, 1fr);
+}

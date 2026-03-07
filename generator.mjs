@@ -1,9 +1,13 @@
-export function generateGrid (height, width = height, defaultValue = false) {
+export function generateGrid (height, width = height, valueFn = () => false) {
 
     const grid = [];
 
-    for (let i = 0; i < height; i++) {
-        grid.push((new Array(width)).fill(defaultValue))
+    for (let y = 0; y < height; y++) {
+        const currRow = [];
+        for (let x = 0; x < width; x++) {
+            currRow.push(valueFn());
+        }
+        grid.push(currRow)
     }
 
     return grid;

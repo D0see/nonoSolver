@@ -1,9 +1,9 @@
-import { solveNonogram as solver3 } from './solver3.js';
-import { solveNonogram as solver2 } from './solver2.js';
-import { solveNonogram as solver1} from './solver1.js';
-import { buildTestGrid } from './generator.js';
+import { solveNonogram as solver3 } from './solver3.mjs';
+import { solveNonogram as solver2 } from './solver2.mjs';
+import { solveNonogram as solver1} from './solver1.mjs';
+import { buildTestGrid } from './generator.mjs';
 
-for (let i = 2; i < 20; i++) {
+for (let i = 2; i <= 20; i++) {
     const [rows, columns] = buildTestGrid(i);
 
     console.time('3- ' + i);

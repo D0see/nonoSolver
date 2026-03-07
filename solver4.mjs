@@ -1,4 +1,4 @@
-import { generateGrid } from "./generator.js";
+import { generateGrid } from "./generator.mjs";
 
 function getArrangements(
     numberArr, 
@@ -142,7 +142,7 @@ function pruneRowsAndColumnsArrangements (
     let grid = generateGrid(
         rowsArrangements.length, 
         columnsArrangements.length, 
-        true
+        () => true
     );
 
     //fill the grid with true present for all possible row arrangement
@@ -163,12 +163,6 @@ function pruneRowsAndColumnsArrangements (
             return true;
         });
     }
-
-    grid = generateGrid(
-        rowsArrangements.length, 
-        columnsArrangements.length, 
-        true
-    );
 
     //fill the grid with true present for all possible column arrangements
     for (const [x, columnArrangements] of columnsArrangements.entries()) {
@@ -210,6 +204,7 @@ export function solveNonogram (
         numOfRowsArrangements !== numOfPrunedRowsArrangements 
         && numOfColumnsArrangements !== numOfPrunedColumnsArrangements
     ) {
+
         numOfRowsArrangements = numOfPrunedRowsArrangements;
         numOfColumnsArrangements = numOfPrunedColumnsArrangements;
 
@@ -220,12 +215,6 @@ export function solveNonogram (
 
         numOfPrunedRowsArrangements = prunedRowsArrangement.reduce((acc, val) => acc += val.length, 0);
         numOfPrunedColumnsArrangements = prunedColumnsArrangements.reduce((acc, val) => acc += val.length, 0);
-        console.log('_________');
-        console.log('rows', numOfRowsArrangements)
-        console.log('columns', numOfColumnsArrangements);
-        console.log('rows after pruning', numOfPrunedRowsArrangements);
-        console.log('columns after pruning', numOfPrunedColumnsArrangements);
-        console.log('_________');
 
         rowsArrangements = prunedRowsArrangement;
         columnsArrangements = prunedColumnsArrangements;
