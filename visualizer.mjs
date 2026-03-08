@@ -1,10 +1,13 @@
 import { generateGrid, buildTestGrid } from "./generator.mjs";
 import { DomElementNameEnum } from './DomElementNameEnum.mjs';
 import { DomElementColorsEnum } from "./DomElementColorsEnum.mjs";
+import { HTMLElementIdEnum } from "./HTMLElementIdEnum.mjs";
 import { solveNonogram as nonogramSolver3VisualEdition } from './solver3visualization.mjs';
 import { delay } from './utils.mjs'
 
-const container = document.getElementById(DomElementNameEnum.GRID);
+const container = document.getElementById(HTMLElementIdEnum.GRID);
+const rowsInfos = document.getElementById(HTMLElementIdEnum.ROWS_INFOS);
+const columnsInfos = document.getElementById(HTMLElementIdEnum.COLUMNS_INFOS);
 
 async function generateVisualization(
     columns, 
@@ -23,6 +26,26 @@ async function generateVisualization(
     container.style.gridTemplateColumns = 'repeat(' + columns.length + ', 1fr)';
     container.style.gridTemplateRows = 'repeat(' + rows.length + ', 1fr)';
 
+    //generate rows infos
+    rowsInfos.innerHTML = "";
+    rowsInfos.style.gridTemplateRows = 'repeat(' + rows.length + ', 1fr)';
+
+    for (const row of rows) {
+        const currRowInfos = document.createElement(DomElementNameEnum.ROW_INFO);
+        currRowInfos.innerText = row.join(' ');
+        rowsInfos.appendChild(currRowInfos);
+    }
+
+    //generate columns infos
+    columnsInfos.innerHTML = "";
+    columnsInfos.style.gridTemplateColumns = 'repeat(' + columns.length + ', 1fr)';
+
+    for (const row of rows) {
+        const currColumnInfos = document.createElement(DomElementNameEnum.COLUMN_INFO);
+        currColumnInfos.innerText = row.join('\n');
+        columnsInfos.appendChild(currColumnInfos);
+    }
+
     // initializes concrete grid
     concreteGrid.flat().forEach((concreteBlock) => {
         concreteBlock.style.backgroundColor = DomElementColorsEnum.BASE_BLOCK;
@@ -33,11 +56,6 @@ async function generateVisualization(
     });
 
     await solverFn(rows, columns, concreteGrid);
-
-    // await updateConcreteGrid({
-    //         concreteGrid : concreteGrid,
-    //         finishGrid :  true
-    // });
 
     return concreteGrid;
 

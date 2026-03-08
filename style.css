@@ -3,9 +3,58 @@ body {
     width: 95vw;
 }
 
-#grid {
-    width: 600px;
-    height: 600px;
-    margin: 0 auto;
+#top-outer-container {
+    display: flex;
+    flex-direction: row;
+    width: fit-content;
+    align-items: center;
+    margin: 0 auto; 
+}
+
+#general-infos {
+    height: 150px;
+    width: 150px;
     display: grid;
+}
+
+#columns-infos {
+    height: 150px;
+    width: 450px;
+    display: grid;
+}
+
+#bottom-outer-container {
+    display: flex;
+    flex-direction: row;
+    width: fit-content;
+    align-items: center;
+    margin: 0 auto; 
+
+}
+
+#rows-infos {
+    height: 450px;
+    width: 150px;
+    display: grid;
+}
+
+#grid {
+    width: 450px;
+    height: 450px;
+    display: grid;
+
+}
+
+/** TEST */
+
+rowInfo {
+    margin-right: 3px;
+    align-self: center;
+    text-align: right;
+}
+
+columnInfo {
+    text-align: center;
+    height: fit-content;
+    align-self: self-end;
 }
