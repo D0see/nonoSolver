@@ -40,9 +40,9 @@ async function generateVisualization(
     columnsInfos.innerHTML = "";
     columnsInfos.style.gridTemplateColumns = 'repeat(' + columns.length + ', 1fr)';
 
-    for (const row of rows) {
+    for (const column of columns) {
         const currColumnInfos = document.createElement(DomElementNameEnum.COLUMN_INFO);
-        currColumnInfos.innerText = row.join('\n');
+        currColumnInfos.innerText = column.join('\n');
         columnsInfos.appendChild(currColumnInfos);
     }
 
@@ -93,4 +93,4 @@ export async function updateConcreteGrid({
     await delay(delayMs);
 }
 
-await generateVisualization(...buildTestGrid(20), container, nonogramSolver3VisualEdition);
+await generateVisualization(...buildTestGrid(10), container, nonogramSolver3VisualEdition);
