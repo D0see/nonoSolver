@@ -84,11 +84,12 @@ function LoopThroughColumnsArrangementsUntilMatch(colsArrangements, rowArrangeme
 async function recursiveSolver(
     rowsArrangements, 
     columnsArrangements, 
+    concreteGrid,
     rowIndex = 0, 
     colIndex = 0, 
     currGrid = [], 
     columnsArrangementsIndexes = new Array(columnsArrangements.length).fill(0),
-    finalGrid = [false]
+    finalGrid = [false],
 ) {
 
     if (finalGrid[0]) return finalGrid[0];
@@ -110,7 +111,7 @@ async function recursiveSolver(
             //append a reference to current rowArrangement to the current grid to build the solution step by step
             const nextGrid = [...currGrid, rowArrangement];
 
-            await updateConcreteGrid(nextGrid, DomElementColorsEnum.ACTIVATED_BLOCK, 500, false);
+            await updateConcreteGrid(concreteGrid, nextGrid, DomElementColorsEnum.ACTIVATED_BLOCK, 50, false);
 
 
             //if this was the last row, return the grid (ends the solve)
@@ -123,11 +124,12 @@ async function recursiveSolver(
             await recursiveSolver(
                 rowsArrangements,
                 columnsArrangements, 
+                concreteGrid,
                 rowIndex + 1, 
                 colIndex, 
                 nextGrid,
                 nextColumnsArrangementsIndexes,
-                finalGrid
+                finalGrid,
             );
 
             if (finalGrid[0]) return finalGrid[0];
@@ -140,7 +142,8 @@ async function recursiveSolver(
 //todo i could just store a map of true positions and check against that instead of storing the full grid
 async function filterRowsAndColumnsAgainstEachother (
     rowsArrangements, 
-    columnsArrangements
+    columnsArrangements,
+    concreteGrid
 ) {
 
     let grid = generateGrid(
@@ -158,7 +161,7 @@ async function filterRowsAndColumnsAgainstEachother (
         }
     }
 
-    await updateConcreteGrid(grid, DomElementColorsEnum.ROW_PRUNED_BLOCK);
+    await updateConcreteGrid(concreteGrid, grid, DomElementColorsEnum.ROW_PRUNED_BLOCK);
 
     //prune columns
     for (const [x, columnArrangements] of columnsArrangements.entries()) {
@@ -188,7 +191,7 @@ async function filterRowsAndColumnsAgainstEachother (
         }
     }
 
-    await updateConcreteGrid(grid, DomElementColorsEnum.COLUMN_PRUNED_BLOCK);
+    await updateConcreteGrid(concreteGrid, grid, DomElementColorsEnum.COLUMN_PRUNED_BLOCK);
 
     //prune rows
     for (const [y, rowArrangements] of rowsArrangements.entries()) {
@@ -207,7 +210,8 @@ async function filterRowsAndColumnsAgainstEachother (
 
 async function prune(
     rowsArrangements,
-    columnsArrangements
+    columnsArrangements,
+    concreteGrid
 ) {
 
     let numOfRowsArrangements = rowsArrangements.reduce((acc, val) => acc += val.length, 0);
@@ -226,7 +230,8 @@ async function prune(
         let prunedRowsArrangement, prunedColumnsArrangements;
         [prunedRowsArrangement, prunedColumnsArrangements] = await filterRowsAndColumnsAgainstEachother(
             rowsArrangements, 
-            columnsArrangements
+            columnsArrangements,
+            concreteGrid
         );
 
         numOfPrunedRowsArrangements = prunedRowsArrangement.reduce((acc, val) => acc += val.length, 0);
@@ -241,6 +246,7 @@ async function prune(
 export async function solveNonogram (
     rows,
     columns, 
+    concreteGrid
 ) {
 
     let rowsArrangements = rows.map(row => getArrangements(row, columns.length));
@@ -249,7 +255,8 @@ export async function solveNonogram (
     [rowsArrangements, columnsArrangements] = await prune(
         rowsArrangements, 
         columnsArrangements,
+        concreteGrid
     );
 
-    return await recursiveSolver(rowsArrangements, columnsArrangements);
+    return await recursiveSolver(rowsArrangements, columnsArrangements, concreteGrid);
 }
