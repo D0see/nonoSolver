@@ -111,8 +111,14 @@ async function recursiveSolver(
             //append a reference to current rowArrangement to the current grid to build the solution step by step
             const nextGrid = [...currGrid, rowArrangement];
 
-            await updateConcreteGrid(concreteGrid, nextGrid, DomElementColorsEnum.ACTIVATED_BLOCK, 50, false);
-
+            await updateConcreteGrid({
+                concreteGrid : concreteGrid,
+                grid : nextGrid, 
+                color : DomElementColorsEnum.ACTIVATED_BLOCK, 
+                delayMs : 15,
+                activateBlock : false,
+            });
+            
 
             //if this was the last row, return the grid (ends the solve)
             if (rowIndex === rowArrangement.length - 1) {
@@ -161,7 +167,13 @@ async function filterRowsAndColumnsAgainstEachother (
         }
     }
 
-    await updateConcreteGrid(concreteGrid, grid, DomElementColorsEnum.ROW_PRUNED_BLOCK);
+    await updateConcreteGrid({
+        concreteGrid : concreteGrid,
+        grid : grid, 
+        color : DomElementColorsEnum.ROW_PRUNED_BLOCK, 
+        delayMs : 15,
+        activateBlock : true,
+    });
 
     //prune columns
     for (const [x, columnArrangements] of columnsArrangements.entries()) {
@@ -191,7 +203,13 @@ async function filterRowsAndColumnsAgainstEachother (
         }
     }
 
-    await updateConcreteGrid(concreteGrid, grid, DomElementColorsEnum.COLUMN_PRUNED_BLOCK);
+    await updateConcreteGrid({
+        concreteGrid : concreteGrid,
+        grid : grid, 
+        color : DomElementColorsEnum.COLUMN_PRUNED_BLOCK, 
+        delayMs : 15,
+        activateBlock : true,
+    });
 
     //prune rows
     for (const [y, rowArrangements] of rowsArrangements.entries()) {

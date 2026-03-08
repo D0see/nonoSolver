@@ -1,7 +1,7 @@
 import { generateGrid, buildTestGrid } from "./generator.mjs";
 import { DomElementNameEnum } from './DomElementNameEnum.mjs';
 import { DomElementColorsEnum } from "./DomElementColorsEnum.mjs";
-import { solveNonogram } from './solver3visualization.mjs';
+import { solveNonogram as nonogramSolver3VisualEdition } from './solver3visualization.mjs';
 import { delay } from './utils.mjs'
 
 const container = document.getElementById(DomElementNameEnum.GRID);
@@ -26,7 +26,7 @@ async function generateVisualization(
     // initializes concrete grid
     concreteGrid.flat().forEach((concreteBlock) => {
         concreteBlock.style.backgroundColor = DomElementColorsEnum.BASE_BLOCK;
-        concreteBlock.style.border = '1px solid black';
+        concreteBlock.style.border = '1px solid white';
 
         container.appendChild(concreteBlock);
 
@@ -34,24 +34,24 @@ async function generateVisualization(
 
     await solverFn(rows, columns, concreteGrid);
 
-    await updateConcreteGrid(
-        concreteGrid,
-        undefined, undefined, undefined, undefined,
-        true
-    )
+    // await updateConcreteGrid({
+    //         concreteGrid : concreteGrid,
+    //         finishGrid :  true
+    // });
 
     return concreteGrid;
 
 }
 
-export async function updateConcreteGrid(
-    concreteGrid,
-    grid = [], 
-    color = DomElementColorsEnum.ACTIVATED_BLOCK, 
-    delayMs = 500,
-    activateBlock = true,
-    finishGrid = false
-) {
+export async function updateConcreteGrid({
+        concreteGrid = concreteGrid,
+        grid = [], 
+        color = DomElementColorsEnum.ACTIVATED_BLOCK, 
+        delayMs = 500,
+        activateBlock = true,
+        finishGrid =  false
+    }) 
+{
     for (let y = 0; y < concreteGrid.length; y++) {
         for (let x = 0; x < concreteGrid[0].length; x++) {
             const currConcreteBlock = concreteGrid[y][x];
@@ -75,4 +75,4 @@ export async function updateConcreteGrid(
     await delay(delayMs);
 }
 
-await generateVisualization(...buildTestGrid(10), container, solveNonogram);
+await generateVisualization(...buildTestGrid(20), container, nonogramSolver3VisualEdition);
