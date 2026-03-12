@@ -3,6 +3,7 @@ import { DomElementNameEnum } from './DomElementNameEnum.mjs';
 import { DomElementColorsEnum } from "./DomElementColorsEnum.mjs";
 import { HTMLElementIdEnum } from "./HTMLElementIdEnum.mjs";
 import { solveNonogram as nonogramSolver3VisualEdition } from './solver3visualization.mjs';
+import { solveNonogram as nonogramSolver4VisualEdition } from './solver4visualization.mjs';
 import { delay } from './utils.mjs'
 
 const container = document.getElementById(HTMLElementIdEnum.GRID);
@@ -90,6 +91,7 @@ export async function updateConcreteGrid({
         finishGrid =  false
     }) 
 {
+    
     for (let y = 0; y < concreteGrid.length; y++) {
         for (let x = 0; x < concreteGrid[0].length; x++) {
             const currConcreteBlock = concreteGrid[y][x];
@@ -132,4 +134,6 @@ export async function updateColumnsPermutationsInfos(columnsPermutations, indexe
     }
 }
 
-await generateVisualization(...buildTestGrid(15), container, nonogramSolver3VisualEdition);
+// await generateVisualization(...buildTestGrid(15), container, nonogramSolver3VisualEdition);
+await generateVisualization(...buildTestGrid(15), container, nonogramSolver4VisualEdition);
+

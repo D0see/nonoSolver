@@ -48,11 +48,12 @@ function getArrangements(
 
 function currColArrangementFitsRow(currColArrangement, currColIndex, rowArrangement, rowIndex, currGrid) {
 
-    for (let y = 0; y < currGrid.length; y++) {
-        if (currColArrangement[y] !== currGrid[y][currColIndex]) return false;
+    for (const y in currGrid) {
+        const rowArrangement = currGrid[y];
+        if (currColArrangement[y] !== rowArrangement[currColIndex]) return false;
     }
 
-    if (currGrid.length && currColArrangement[rowIndex] !== rowArrangement[currColIndex]) return false;
+    if (rowIndex > 1 && currColArrangement[rowIndex] !== rowArrangement[currColIndex]) return false;
 
     return true;
 }
@@ -82,66 +83,71 @@ function LoopThroughColumnsArrangementsUntilMatch(colsArrangements, rowArrangeme
 }
 
 async function recursiveSolver(
-    rowsArrangements, 
+    rowsArrangementsSorted, 
     columnsArrangements, 
     concreteGrid,
-    rowIndex = 0, 
-    colIndex = 0, 
-    currGrid = [], 
+    currRowsArrsIndex = 0, 
+    currGrid = {}, 
     columnsArrangementsIndexes = new Array(columnsArrangements.length).fill(0),
     finalGrid = [false],
 ) {
 
     if (finalGrid[0]) return finalGrid[0];
 
-    for (let y = rowIndex; y < rowsArrangements.length; y++) {
+    const rowIndex = rowsArrangementsSorted[currRowsArrsIndex].y;
+    const rowArrangements = rowsArrangementsSorted[currRowsArrsIndex].arrangements;
 
-        for (const [rowArrangementIndex, rowArrangement] of rowsArrangements[y].entries()) {
+    for (const rowArrangement of rowArrangements) {
 
-            const nextColumnsArrangementsIndexes = LoopThroughColumnsArrangementsUntilMatch(
-                columnsArrangements, 
-                rowArrangement, 
-                currGrid, 
-                rowIndex, 
-                [...columnsArrangementsIndexes]
-            );
+        //todo update this func
+        const nextColumnsArrangementsIndexes = LoopThroughColumnsArrangementsUntilMatch(
+            columnsArrangements, 
+            rowArrangement, 
+            currGrid, 
+            rowIndex, 
+            [...columnsArrangementsIndexes]
+        );
 
-            await updateRowsPermutationsInfos(rowsArrangements, rowArrangementIndex, y);
+        //todo fix this
+        // await updateRowsPermutationsInfos(rowsArrangements, rowArrangementIndex, y);
 
-            if (!nextColumnsArrangementsIndexes) continue;
+        if (!nextColumnsArrangementsIndexes) continue;
 
-            //append a reference to current rowArrangement to the current grid to build the solution step by step
-            const nextGrid = [...currGrid, rowArrangement];
+        const nextGrid = 
+        {
+            ...currGrid, 
+            [`${rowIndex}`]: rowArrangement
+        };
 
-            await updateConcreteGrid({
-                concreteGrid : concreteGrid,
-                grid : nextGrid, 
-                color : DomElementColorsEnum.ACTIVATED_BLOCK, 
-                activateBlock : false,
-            });
+        console.table(nextGrid);
 
-            await updateColumnsPermutationsInfos(columnsArrangements, nextColumnsArrangementsIndexes);
+        await updateConcreteGrid({
+            concreteGrid : concreteGrid,
+            grid : await gridObjectToTwoDArr(nextGrid), 
+            color : DomElementColorsEnum.ACTIVATED_BLOCK, 
+            activateBlock : false,
+        });
 
-            //if this was the last row, return the grid (ends the solve)
-            if (rowIndex === rowArrangement.length - 1) {
-                finalGrid[0] = nextGrid;
+        await updateColumnsPermutationsInfos(columnsArrangements, nextColumnsArrangementsIndexes);
 
-                return finalGrid[0];
-            }
+        //if this was the last row, return the grid (ends the solve)
+        if (currRowsArrsIndex === rowsArrangementsSorted.length - 1) {
+            finalGrid[0] = nextGrid;
 
-            await recursiveSolver(
-                rowsArrangements,
-                columnsArrangements, 
-                concreteGrid,
-                rowIndex + 1, 
-                colIndex, 
-                nextGrid,
-                nextColumnsArrangementsIndexes,
-                finalGrid,
-            );
-
-            if (finalGrid[0]) return finalGrid[0];
+            return finalGrid[0];
         }
+
+        await recursiveSolver(
+            rowsArrangementsSorted,
+            columnsArrangements, 
+            concreteGrid,
+            currRowsArrsIndex + 1, 
+            nextGrid,
+            nextColumnsArrangementsIndexes,
+            finalGrid,
+        );
+
+        if (finalGrid[0]) return finalGrid[0];
     }
 
     return finalGrid[0];
@@ -257,6 +263,34 @@ async function prune(
     return [rowsArrangements, columnsArrangements, grid];
 }
 
+//[[[]]] => 
+// [{
+//     y:
+//     arrangements: [[]]
+// }]
+function sortBasedOnNumberOfElementsWhileSavingOriginalIndex(rowsArrangements) {
+    return rowsArrangements.map(function (rowArrangements, index) {
+        return {
+            y: index,
+            arrangements: rowArrangements
+        }
+    }).toSorted((a, b) => a.arrangements.length - b.arrangements.length);
+}
+
+async function gridObjectToTwoDArr(gridObject) {
+
+    const arr = (
+        new Array(
+            Math.max(...Object.keys(gridObject).map(Number), 0) + 1  
+    ).fill(null));
+
+    for (let y = 0; y < arr.length; y++) {
+        arr[y] = gridObject?.[y] ?? []; 
+    }
+
+    return arr;
+}
+
 export async function solveNonogram (
     rows,
     columns, 
@@ -275,5 +309,16 @@ export async function solveNonogram (
         concreteGrid
     );
 
-    return await recursiveSolver(rowsArrangements, columnsArrangements, concreteGrid);
+    const rowsArrangementsSortedBasedOnNumberOfPermutations = sortBasedOnNumberOfElementsWhileSavingOriginalIndex(
+        rowsArrangements
+    );
+
+        console.table(rowsArrangementsSortedBasedOnNumberOfPermutations.map((a) => [a.arrangements.length, a.y]))
+
+
+    return await recursiveSolver(rowsArrangementsSortedBasedOnNumberOfPermutations, columnsArrangements, concreteGrid);
 }
+
+
+//the idea for this one is to sort the column based on number of permutations and start to solve
+//from fewer perms rows to higher number of perms rows

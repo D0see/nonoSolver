@@ -91,6 +91,8 @@ function LoopThroughColumnsArrangementsUntilMatch(colsArrangements, rowArrangeme
 
     if (finalGrid[0]) return finalGrid[0];
 
+    for (currRowsArrsIndex; currRowsArrsIndex < rowsArrangementsSorted.length; currRowsArrsIndex++) {
+
         const rowIndex = rowsArrangementsSorted[currRowsArrsIndex].y;
         const rowArrangements = rowsArrangementsSorted[currRowsArrsIndex].arrangements;
 
@@ -114,13 +116,13 @@ function LoopThroughColumnsArrangementsUntilMatch(colsArrangements, rowArrangeme
             };
 
             //if this was the last row, return the grid (ends the solve)
-            if (currRowsArrsIndex === rowsArrangementsSorted.length - 1) {
+            if (rowIndex === rowsArrangementsSorted.length - 1) {
                 finalGrid[0] = nextGrid;
 
                 return finalGrid[0];
             }
 
-            recursiveSolver(
+             recursiveSolver(
                 rowsArrangementsSorted,
                 columnsArrangements, 
                 currRowsArrsIndex + 1, 
@@ -130,6 +132,7 @@ function LoopThroughColumnsArrangementsUntilMatch(colsArrangements, rowArrangeme
             );
 
             if (finalGrid[0]) return finalGrid[0];
+        }
     }
 
     return finalGrid[0];

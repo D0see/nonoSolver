@@ -38,9 +38,5 @@ for (let i = 2; i <= 15; i++) {
 
 // const [rows, columns] = buildTestGrid(14);
 
-// console.log(rows, columns);
-
-// const [rows, columns] = buildTestGrid(14);
-
 // console.log(rows);
 // console.log(columns);
